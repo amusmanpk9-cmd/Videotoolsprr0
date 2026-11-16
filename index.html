@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>VideoTools Pro — All Video Tools</title>
+<style>
+:root{--bg:#f4f7fb;--ink:#182230;--muted:#64748b;--blue:#2563eb;--line:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#111827;color:white;padding:18px 5%;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;font-size:20px;letter-spacing:-.5px}.brand span{color:#60a5fa}
+main{max-width:1050px;margin:34px auto;padding:0 16px}.hero{text-align:center;padding:24px 8px 30px}
+h1{font-size:clamp(30px,6vw,48px);line-height:1.08;margin:0 0 12px;letter-spacing:-1.5px}
+p{color:var(--muted);line-height:1.55}.hero p{max-width:620px;margin:0 auto}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 18px #0f172a08}
+.card h2{font-size:18px;margin:8px 0}.icon{font-size:27px}.card p{font-size:14px;min-height:42px}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;background:white;font:inherit;min-width:0}
+button{width:100%;border:0;border-radius:10px;background:var(--blue);color:white;padding:12px 14px;font-weight:700;font-size:15px;margin-top:12px;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}.note{font-size:12px;color:var(--muted)}.status{margin-top:12px;font-size:13px;overflow-wrap:anywhere}
+.youtube{margin-top:18px;border-color:#fecaca}.youtube button{background:#dc2626}
+footer{text-align:center;padding:30px 16px;color:var(--muted);font-size:12px}
+@media(max-width:520px){main{margin-top:16px}.card{padding:17px}}
+</style>
+</head>
+<body>
+<header><div class="brand">▶ VideoTools <span>Pro</span></div><div style="font-size:12px;color:#cbd5e1">Free starter</div></header>
+<main>
+<section class="hero"><h1>All your video tools<br>in one place.</h1><p>Convert, compress, extract audio and trim videos online. Upload a video to get started.</p></section>
+<section class="tools">
+<article class="card">
+<div class="icon">🔄</div><h2>Video Converter</h2><p>Convert a video into MP4, MOV, WEBM, AVI or MP3.</p>
+<form data-endpoint="/api/convert" data-download>
+<label>Choose video or audio</label><input name="file" type="file" accept="video/*,audio/*" required>
+<label>Convert to</label><select name="output_format"><option>mp4</option><option>mov</option><option>webm</option><option>avi</option><option>mp3</option></select>
+<button>Convert & Download</button><div class="status" aria-live="polite"></div></form>
+</article>
+<article class="card">
+<div class="icon">📦</div><h2>Compress Video</h2><p>Reduce video file size while keeping useful quality.</p>
+<form data-endpoint="/api/compress" data-download>
+<label>Choose video</label><input name="file" type="file" accept="video/*" required>
+<label>Quality</label><select name="quality"><option value="balanced">Balanced</option><option value="high">Smaller file</option><option value="best">Higher quality</option></select>
+<button>Compress & Download</button><div class="status" aria-live="polite"></div></form>
+</article>
+<article class="card">
+<div class="icon">🎵</div><h2>Video to MP3</h2><p>Extract the audio track from a video you can use.</p>
+<form data-endpoint="/api/audio" data-download>
+<label>Choose video</label><input name="file" type="file" accept="video/*,audio/*" required>
+<button>Extract MP3</button><div class="status" aria-live="polite"></div></form>
+</article>
+<article class="card">
+<div class="icon">✂️</div><h2>Trim Video</h2><p>Cut a section from the beginning or middle of a video.</p>
+<form data-endpoint="/api/trim" data-download>
+<label>Choose video</label><input name="file" type="file" accept="video/*" required>
+<label>Start time (seconds)</label><input name="start" type="number" min="0" value="0" step="0.1" required>
+<label>Duration (seconds)</label><input name="duration" type="number" min="0.1" max="3600" value="10" step="0.1" required>
+<button>Trim & Download</button><div class="status" aria-live="polite"></div></form>
+</article>
+</section>
+<article class="card youtube">
+<div class="icon">▶️</div><h2>YouTube Link</h2>
+<p>Paste a YouTube link to see the supported options. This website does not scrape YouTube or bypass download restrictions. Use official/offline options or a source that explicitly authorizes downloading.</p>
+<form id="ytform">
+<label>YouTube video link</label><input name="url" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
+<button>Check link options</button><div class="status" aria-live="polite"></div>
+</form></article>
+</main>
+
+<article class="card" style="margin-top:18px">
+<div class="icon">🌐</div><h2>Facebook &amp; Dailymotion</h2>
+<p>Check a Facebook or Dailymotion video link. For permitted videos, obtain the file through the platform's official tools or an authorized provider, then use the converter above.</p>
+<form id="socialform">
+<label>Platform</label><select name="platform"><option value="facebook">Facebook</option><option value="dailymotion">Dailymotion</option></select>
+<label>Video link</label><input name="url" type="url" placeholder="Paste Facebook or Dailymotion URL" required>
+<button>Check link options</button><div class="status" aria-live="polite"></div>
+</form></article>
+<footer>VideoTools Pro · Only upload media you own or are authorized to process.</footer>
+<script>
+async function handleForm(form){
+ const status=form.querySelector('.status'); const button=form.querySelector('button');
+ button.disabled=true; status.textContent='Working…';
+ try{
+  const response=await fetch(form.dataset.endpoint,{method:'POST',body:new FormData(form)});
+  const type=response.headers.get('content-type')||'';
+  if(!response.ok){let msg='Something went wrong.';try{const d=await response.json();msg=d.detail||d.message||msg}catch{}throw new Error(msg)}
+  if(type.includes('application/json')){const d=await response.json();status.textContent=d.message;return}
+  const blob=await response.blob();const disposition=response.headers.get('content-disposition')||'';
+  const match=disposition.match(/filename="?([^"]+)"?/);const filename=match?match[1]:'videotools-output';
+  const link=document.createElement('a');const objectUrl=URL.createObjectURL(blob);
+  link.href=objectUrl;link.download=filename;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(objectUrl);
+  status.textContent='Done. Your download should start now.';
+ }catch(e){status.textContent=e.message}
+ finally{button.disabled=false}
+}
+document.querySelectorAll('form[data-endpoint]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();handleForm(f)}));
+
+document.getElementById('socialform').addEventListener('submit',async e=>{
+ e.preventDefault();const form=e.currentTarget;const status=form.querySelector('.status');const button=form.querySelector('button');
+ button.disabled=true;status.textContent='Checking…';
+ try{const r=await fetch('/api/social-link',{method:'POST',body:new FormData(form)});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Could not check link.');status.textContent=d.message}
+ catch(err){status.textContent=err.message}finally{button.disabled=false}
+});
+document.getElementById('ytform').addEventListener('submit',async e=>{
+ e.preventDefault();const form=e.currentTarget;const status=form.querySelector('.status');const button=form.querySelector('button');
+ button.disabled=true;status.textContent='Checking…';
+ try{const r=await fetch('/api/youtube-link',{method:'POST',body:new FormData(form)});const d=await r.json();if(!r.ok)throw new Error(d.detail||'Could not check link.');status.textContent=d.message}
+ catch(err){status.textContent=err.message}finally{button.disabled=false}
+});
+</script>
+</body></html>
